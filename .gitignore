@@ -8,3 +8,4 @@ terraform.tfvars
 *.tfstate
 *.tfstate.backup
 *.tfstate.*.backup
+tf_outputs.json
