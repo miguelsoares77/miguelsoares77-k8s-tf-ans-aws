@@ -1,0 +1,77 @@
+- name: Install and configure Node Exporter
+  hosts: all
+  become: yes
+  tasks:
+    - name: Download Node Exporter
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v1.3.1/node_exporter-1.3.1.linux-amd64.tar.gz"
+        dest: "/tmp/node_exporter-1.3.1.linux-amd64.tar.gz"
+
+    - name: Extract Node Exporter
+      ansible.builtin.unarchive:
+        src: "/tmp/node_exporter-1.3.1.linux-amd64.tar.gz"
+        dest: "/tmp"
+        remote_src: yes
+
+    - name: Copy Node Exporter binary to /usr/local/bin
+      copy:
+        src: "/tmp/node_exporter-1.3.1.linux-amd64/node_exporter"
+        dest: "/usr/local/bin/node_exporter"
+        mode: '0755'
+        remote_src: yes
+
+    - name: Remove extracted files
+      file:
+        path: "/tmp/node_exporter-1.3.1.linux-amd64"
+        state: absent
+
+    - name: Create node_exporter user
+      user:
+        name: node_exporter
+        shell: /bin/false
+        create_home: no
+
+    - name: Set ownership of Node Exporter binary
+      file:
+        path: "/usr/local/bin/node_exporter"
+        owner: node_exporter
+        group: node_exporter
+        mode: '0755'
+
+    - name: Create systemd service file for Node Exporter
+      copy:
+        dest: "/etc/systemd/system/node_exporter.service"
+        content: |
+          [Unit]
+          Description=Node Exporter
+          Wants=network-online.target
+          After=network-online.target
+          
+          [Service]
+          User=node_exporter
+          Group=node_exporter
+          Type=simple
+          ExecStart=/usr/local/bin/node_exporter
+          Restart=always
+          RestartSec=3
+          
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable Node Exporter service
+      systemd:
+        name: node_exporter
+        enabled: yes
+
+    - name: Start Node Exporter service
+      systemd:
+        name: node_exporter
+        state: started
+
+# run with:
+  # sudo -E ansible-playbook -i ../../1.RKS/inventory-RKS.ini install_node_exporter.yml 
+  # sudo -E ansible-playbook -i ../../1.CMR/inventory-CMR.ini install_node_exporter.yml

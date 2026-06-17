@@ -1,0 +1,10 @@
+notes.txt
+command.txt
+terraform.tfstate
+terraform.tfstate.backup
+.terraform
+.terraform.lock.hcl
+terraform.tfvars
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup

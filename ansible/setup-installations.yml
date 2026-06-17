@@ -1,0 +1,21 @@
+---
+- name: Infra setup
+  hosts: all
+  become: true  # Use sudo
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600  # Optional: only update if cache is older than 1 hour
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Install passlib system package
+      apt:
+        name: python3-passlib
+        state: present
+        update_cache: yes
