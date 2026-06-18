@@ -1,9 +1,9 @@
 variable "controlplane_count" {
-  default = 0
+  default = 1
 }
 
 variable "worker_count" {
-  default = 0
+  default = 2
 }
 
 resource "aws_instance" "controlplane" {

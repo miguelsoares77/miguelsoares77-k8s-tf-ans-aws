@@ -9,6 +9,11 @@
         update_cache: yes
         cache_valid_time: 3600
 
+    - name: Change hostname
+      ansible.builtin.hostname:
+        name: "novo-hostname-aqui"
+      become: true
+
     - name: Install Docker
       apt:
         name: docker.io
