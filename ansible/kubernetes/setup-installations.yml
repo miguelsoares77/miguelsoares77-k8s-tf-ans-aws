@@ -13,6 +13,12 @@
       apt:
         name: docker.io
         state: present
+    
+    - name: Docker group
+      ansible.builtin.user:
+        name: ubuntu
+        groups: docker
+        append: yes
 
     - name: Install passlib system package
       apt:

@@ -1,9 +1,20 @@
-output "control_plane_public_ip" {
-  description = "Kubernetes Control plane Public ip"
-  value       = aws_instance.controlplane-01.public_ip
+# Agrupa tudo num único mapa para cada tipo de nó
+output "controlplane_nodes" {
+  value = {
+    for i, inst in aws_instance.controlplane :
+    inst.tags.Name => {
+      public_ip  = inst.public_ip
+      private_ip = inst.private_ip
+    }
+  }
 }
 
-output "control_plane_private_ip" {
-  description = "Kubernetes Control plane Private ip"
-  value       = aws_instance.controlplane-01.private_ip
+output "worker_nodes" {
+  value = {
+    for i, inst in aws_instance.worker :
+    inst.tags.Name => {
+      public_ip  = inst.public_ip
+      private_ip = inst.private_ip
+    }
+  }
 }
