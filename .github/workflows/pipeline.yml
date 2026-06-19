@@ -33,12 +33,6 @@ jobs:
           echo "Secret key set: ${AWS_SECRET_ACCESS_KEY:+yes}"
           aws sts get-caller-identity
 
-      - name: Raw terraform test
-        working-directory: ./terraform/aws-env
-        run: |
-          which terraform || echo "terraform not found, will use setup-terraform version"
-          env | grep AWS
-          
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
