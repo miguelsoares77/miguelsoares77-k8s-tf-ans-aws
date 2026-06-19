@@ -31,7 +31,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
+          aws-region: ${{ variables.AWS_REGION }}
 
       - name: Terraform Init
         run: terraform init
@@ -40,3 +40,5 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
         working-directory: ./terraform/aws-env
+        env:
+          TF_VAR_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
