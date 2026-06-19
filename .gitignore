@@ -9,3 +9,4 @@ terraform.tfvars
 *.tfstate.backup
 *.tfstate.*.backup
 tf_outputs.json
+inventory.ini

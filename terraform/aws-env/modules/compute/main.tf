@@ -9,7 +9,7 @@ variable "worker_count" {
 resource "aws_instance" "controlplane" {
   count = var.controlplane_count
   ami           = "ami-042dc8681de073ac4"
-  instance_type = "t2.nano"
+  instance_type = "t3.small"
   subnet_id     = var.subnet_id
   vpc_security_group_ids = [var.allow_tls_id]
   key_name = var.key_name
@@ -21,7 +21,7 @@ resource "aws_instance" "controlplane" {
 resource "aws_instance" "worker" {
   count = var.worker_count
   ami           = "ami-042dc8681de073ac4"
-  instance_type = "t2.nano"
+  instance_type = "t2.micro"
   subnet_id     = var.subnet_id
   vpc_security_group_ids = [var.allow_tls_id]
   key_name = var.key_name
