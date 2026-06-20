@@ -52,33 +52,33 @@ jobs:
         run: terraform state pull > terraform.tfstate
         working-directory: ./terraform/aws-env
 
-      # - name: Install Ansible
-      #   if: ${{ github.event.inputs.action == 'apply' }}
-      #   run: |
-      #     sudo apt-get update
-      #     sudo apt-get install -y ansible
+      - name: Install Ansible
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
 
-      # - name: Configure SSH key
-      #   if: ${{ github.event.inputs.action == 'apply' }}
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_deploy
-      #     chmod 600 ~/.ssh/id_rsa_deploy
+      - name: Configure SSH key
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_deploy
+          chmod 600 ~/.ssh/id_rsa_deploy
 
-      # - name: Generate Ansible inventory
-      #   if: ${{ github.event.inputs.action == 'apply' }}
-      #   run: python3 inventory.py
-      #   working-directory: ./ansible/kubernetes
+      - name: Generate Ansible inventory
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: python3 inventory.py
+        working-directory: ./ansible/kubernetes
 
-      # - name: Wait for SSH
-      #   if: ${{ github.event.inputs.action == 'apply' }}
-      #   run: ansible all -i inventory.ini -m wait_for_connection -a "timeout=300"
-      #   working-directory: ./ansible/kubernetes
+      - name: Wait for SSH
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: ansible all -i inventory.ini -m wait_for_connection -a "timeout=300"
+        working-directory: ./ansible/kubernetes
 
-      # - name: Install Kubernetes with Ansible
-      #   if: ${{ github.event.inputs.action == 'apply' }}
-      #   run: ansible-playbook -i inventory.ini setup-installations.yml setup-kubernetes.yml
-      #   working-directory: ./ansible/kubernetes
+      - name: Install Kubernetes with Ansible
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: ansible-playbook -i inventory.ini setup-installations.yml setup-kubernetes.yml
+        working-directory: ./ansible/kubernetes
 
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
