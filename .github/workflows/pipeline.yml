@@ -80,6 +80,30 @@ jobs:
         run: ansible-playbook -i inventory.ini setup-installations.yml setup-kubernetes.yml
         working-directory: ./ansible/kubernetes
 
+      - name: Show public IP addresses
+        if: ${{ github.event.inputs.action == 'apply' }}
+        working-directory: ./ansible/kubernetes
+        run: |
+          inventory=$(ansible-inventory -i inventory.ini --list)
+          {
+            echo "## Kubernetes nodes"
+            echo
+            echo "| Role | Instance | Public IP | SSH destination |"
+            echo "| --- | --- | --- | --- |"
+            echo "$inventory" | jq -r '
+              . as $inventory
+              | $inventory.controlplane.hosts[] as $host
+              | $inventory._meta.hostvars[$host] as $vars
+              | "| Control plane | \($host) | `\($vars.ansible_host)` | `\($vars.ansible_user)@\($vars.ansible_host)` |"
+            '
+            echo "$inventory" | jq -r '
+              . as $inventory
+              | $inventory.workers.hosts[] as $host
+              | $inventory._meta.hostvars[$host] as $vars
+              | "| Worker | \($host) | `\($vars.ansible_host)` | `\($vars.ansible_user)@\($vars.ansible_host)` |"
+            '
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         run: terraform destroy -auto-approve
