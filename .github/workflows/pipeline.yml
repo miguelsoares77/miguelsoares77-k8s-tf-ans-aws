@@ -1,16 +1,25 @@
 name: Deploy K8s in AWS
 
 on:
-  # push:
-  #   branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      action:
+        description: Terraform action to run
+        required: true
+        default: apply
+        type: choice
+        options:
+          - apply
+          - destroy
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  TF_VAR_region: ${{ vars.AWS_REGION }}
+  TF_VAR_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
+  TF_IN_AUTOMATION: true
 
 jobs:
-  create-infra:
+  terraform:
     runs-on: ubuntu-latest
 
     permissions:
@@ -32,14 +41,16 @@ jobs:
         with:
           terraform_version: 1.5.7
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }} 
-          
+
       - name: Terraform Init
         run: terraform init
         working-directory: ./terraform/aws-env
 
+      # - name: Terraform Validate
+      #   run: terraform validate
+      #   working-directory: ./terraform/aws-env
+
       - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'apply' }}
         run: terraform plan
         working-directory: ./terraform/aws-env
-        env:
-          TF_VAR_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
-          TF_VAR_region: ${{ vars.AWS_REGION }}
