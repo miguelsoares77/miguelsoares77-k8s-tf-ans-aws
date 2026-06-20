@@ -23,13 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ vars.AWS_REGION }}
-
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -48,3 +41,46 @@ jobs:
         if: ${{ github.event.inputs.action == 'apply' }}
         run: terraform plan
         working-directory: ./terraform/aws-env
+        
+      - name: Terraform Apply
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: terraform apply -auto-approve
+        working-directory: ./terraform/aws-env
+
+      - name: Pull Terraform State
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: terraform state pull > terraform.tfstate
+        working-directory: ./terraform/aws-env
+
+      # - name: Install Ansible
+      #   if: ${{ github.event.inputs.action == 'apply' }}
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y ansible
+
+      # - name: Configure SSH key
+      #   if: ${{ github.event.inputs.action == 'apply' }}
+      #   run: |
+      #     mkdir -p ~/.ssh
+      #     printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa_deploy
+      #     chmod 600 ~/.ssh/id_rsa_deploy
+
+      # - name: Generate Ansible inventory
+      #   if: ${{ github.event.inputs.action == 'apply' }}
+      #   run: python3 inventory.py
+      #   working-directory: ./ansible/kubernetes
+
+      # - name: Wait for SSH
+      #   if: ${{ github.event.inputs.action == 'apply' }}
+      #   run: ansible all -i inventory.ini -m wait_for_connection -a "timeout=300"
+      #   working-directory: ./ansible/kubernetes
+
+      # - name: Install Kubernetes with Ansible
+      #   if: ${{ github.event.inputs.action == 'apply' }}
+      #   run: ansible-playbook -i inventory.ini setup-installations.yml setup-kubernetes.yml
+      #   working-directory: ./ansible/kubernetes
+
+      # - name: Terraform Destroy
+      #   if: ${{ github.event.inputs.action == 'destroy' }}
+      #   run: terraform destroy -auto-approve
+      #   working-directory: ./terraform/aws-env
