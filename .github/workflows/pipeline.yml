@@ -80,7 +80,7 @@ jobs:
       #   run: ansible-playbook -i inventory.ini setup-installations.yml setup-kubernetes.yml
       #   working-directory: ./ansible/kubernetes
 
-      # - name: Terraform Destroy
-      #   if: ${{ github.event.inputs.action == 'destroy' }}
-      #   run: terraform destroy -auto-approve
-      #   working-directory: ./terraform/aws-env
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform/aws-env
