@@ -11,3 +11,4 @@ terraform.tfvars
 tf_outputs.json
 inventory.ini
 .env
+AGENTS.md
